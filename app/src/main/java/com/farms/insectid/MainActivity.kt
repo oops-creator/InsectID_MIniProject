@@ -2,11 +2,13 @@ package com.farms.insectid
 
 import android.content.Intent
 import android.content.pm.ResolveInfo
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import java.io.FileNotFoundException
+import java.io.InputStream
 
 
 class MainActivity : AppCompatActivity() {
@@ -39,6 +41,16 @@ class MainActivity : AppCompatActivity() {
             return;
         } else {
             val retUri: Uri? = data?.data
+
+            try {
+                val inputStream: InputStream? = retUri?.let { contentResolver.openInputStream(it) }
+                val draw = Drawable.createFromStream(inputStream, retUri.toString())
+                findViewById<ImageView>(R.id.insect_image).background = draw
+
+            } catch (e: FileNotFoundException) {
+                //TODO add a function
+
+            }
            
            
 

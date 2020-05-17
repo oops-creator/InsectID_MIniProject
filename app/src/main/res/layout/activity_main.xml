@@ -15,7 +15,7 @@
         app:srcCompat="@android:drawable/divider_horizontal_bright" />
 
     <TextView
-        android:id="@+id/this_insect"
+        android:id="@+id/this_insect_text"
         android:layout_width="match_parent"
         android:layout_height="20dp"
         android:layout_weight="1"
