@@ -30,8 +30,7 @@ class InsectClassifier(private val context: Context) {
     }
 
 
-    // Executor to do inference
-    private val executorService: ExecutorService = Executors.newCachedThreadPool()
+
 
     private var inputImageWidth: Int = 0
     private var inputImageHeight: Int = 0
