@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.res.AssetFileDescriptor
 import android.content.res.AssetManager
 import android.graphics.Bitmap
+import android.graphics.Matrix
+import android.graphics.RectF
 import android.util.Log
 import org.tensorflow.lite.Interpreter
 import java.io.FileInputStream
@@ -30,14 +32,12 @@ class InsectClassifier(private val context: Context) {
     }
 
 
-
-
     private var inputImageWidth: Int = 0
     private var inputImageHeight: Int = 0
     private var modelInputSize: Int = 0
 
     @Throws(IOException::class)
-    private fun initializeInterpreter() {
+    fun initializeInterpreter() {
 
 
         // Load the TF Lite model from asset folder
@@ -63,20 +63,20 @@ class InsectClassifier(private val context: Context) {
 
 
     @Throws(IOException::class)
-    private  fun loadModelFile(assetManager: AssetManager , filename: String):ByteBuffer{
+    private fun loadModelFile(assetManager: AssetManager, filename: String): ByteBuffer {
         val fileDescriptor = assetManager.openFd(filename)
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel = inputStream.channel
         val startOffset = fileDescriptor.startOffset
         val declaredLength = fileDescriptor.declaredLength
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY , startOffset , declaredLength)
-        
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+
     }
 
-    private fun classify(bitmap: Bitmap): String {
+    fun classify(bitmap: Bitmap): String {
         check(isInitialized) { "TF Lite not initialized" }
 
-  
+
         val resizedImage = Bitmap.createScaledBitmap(
             bitmap,
             inputImageWidth,
@@ -85,6 +85,7 @@ class InsectClassifier(private val context: Context) {
         )
         val byteBuffer = convertBitmapToByteBuffer(resizedImage)
 
+
         //Array to store the model output.
         val output = Array(1) { FloatArray(OUTPUT_CLASSES_COUNT) }
 
@@ -92,34 +93,65 @@ class InsectClassifier(private val context: Context) {
         interpreter?.run(byteBuffer, output)
 
 
-
         val result = output[0]
         val maxIndex = result.indices.maxBy { result[it] } ?: -1
+
         val resultString =
             "Prediction Result: %d\nConfidence: %2f"
                 .format(maxIndex, result[maxIndex])
 
-        Log.e("result" , resultString)
+        Log.e("result", resultString)
         return resultString
     }
 
-    private fun convertBitmapToByteBuffer(bitmap: Bitmap): ByteBuffer {
-        val byteBuffer = ByteBuffer.allocateDirect(modelInputSize)
-        byteBuffer.order(ByteOrder.nativeOrder())
+//    private fun convertBitmapToByteBuffer(bitmap: Bitmap): ByteBuffer {
+//        val byteBuffer = ByteBuffer.allocateDirect(modelInputSize)
+//        byteBuffer.order(ByteOrder.nativeOrder())
+//
+//        val pixels = IntArray(inputImageWidth * inputImageHeight)
+//        bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+//
+//
+//        for (pixelValue in pixels) {
+//
+//            // Normalize pixel value to 0 to 1
+//            val normalizedPixelValue = pixelValue / 255.0f
+//
+//            byteBuffer.putFloat(normalizedPixelValue)
+//
+//        }
+//
+//        return byteBuffer
+//    }
 
-        val pixels = IntArray(inputImageWidth * inputImageHeight)
-        bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+    fun convertBitmapToByteBuffer(bitmapIn: Bitmap,
+                           width: Int = 224, height: Int = 224,
+                           mean: Float = 0.0f,std: Float = 255.0f ): ByteBuffer {
+        val bitmap = bitmapIn
+        val inputImage = ByteBuffer.allocateDirect(1 * width * height * 3 * 4)
+        inputImage.order(ByteOrder.nativeOrder())
+        inputImage.rewind()
 
+        val intValues = IntArray(width * height)
+        bitmap.getPixels(intValues, 0, width, 0, 0, width, height)
+        var pixel = 0
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                val value = intValues[pixel++]
 
-        for (pixelValue in pixels) {
+                // Normalize channel values 
+                inputImage.putFloat(((value shr 16 and 0xFF) - mean) / std)
 
-            // Normalize pixel value to 0 to 1
-            val normalizedPixelValue = pixelValue/ 255.0f
+                inputImage.putFloat(((value shr 8 and 0xFF) - mean) / std)
 
-            byteBuffer.putFloat(normalizedPixelValue)
+                inputImage.putFloat(((value and 0xFF) - mean) / std)
+            }
         }
 
-        return byteBuffer
+        inputImage.rewind()
+        return inputImage
     }
+
+
 
 }

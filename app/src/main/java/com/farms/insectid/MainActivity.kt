@@ -8,9 +8,10 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import java.io.FileNotFoundException
 import java.io.InputStream
 
@@ -19,7 +20,18 @@ class MainActivity : AppCompatActivity() {
 
     val job = Job()
     lateinit var bitmap: Bitmap
+    private val uiScope = CoroutineScope(Dispatchers.Main + job)
+    private var modelloaded = false
+    val classifier = InsectClassifier(this)
+    var identified = ""
 
+    init {
+        uiScope.launch {
+            withContext(Dispatchers.IO){
+                classifier.initializeInterpreter()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +51,10 @@ class MainActivity : AppCompatActivity() {
                 startActivityForResult(OpenImage, 0)
             }
         }
+
     }
+
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -50,12 +65,19 @@ class MainActivity : AppCompatActivity() {
             val retUri: Uri? = data?.data
 
             try {
-                val source = retUri?.let { ImageDecoder.createSource(this.contentResolver, it) }
-                bitmap = source?.let { ImageDecoder.decodeBitmap(it) }!!
-                //bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, retUri)
+//                val source = retUri?.let { ImageDecoder.createSource(this.contentResolver, it) }
+//                bitmap = source?.let { ImageDecoder.decodeBitmap(it) }!!
+                bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, retUri)
                 val inputStream: InputStream? = retUri?.let { contentResolver.openInputStream(it) }
                 val draw = Drawable.createFromStream(inputStream, retUri.toString())
                 findViewById<ImageView>(R.id.insect_image).background = draw
+                uiScope.launch {
+                    withContext(Dispatchers.IO){
+                        identified = classifier.classify(bitmap)
+                    }
+                    Log.e("identity" , identified)
+                }
+
 
             } catch (e: FileNotFoundException) {
                 //TODO add a function
