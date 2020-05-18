@@ -100,6 +100,7 @@ class InsectClassifier(private val context: Context) {
             "Prediction Result: %d\nConfidence: %2f"
                 .format(maxIndex, result[maxIndex])
 
+        val res = result[maxIndex].toString()
         Log.e("result", resultString)
         return resultString
     }
@@ -139,7 +140,7 @@ class InsectClassifier(private val context: Context) {
             for (x in 0 until width) {
                 val value = intValues[pixel++]
 
-                // Normalize channel values 
+                // Normalize channel values
                 inputImage.putFloat(((value shr 16 and 0xFF) - mean) / std)
 
                 inputImage.putFloat(((value shr 8 and 0xFF) - mean) / std)

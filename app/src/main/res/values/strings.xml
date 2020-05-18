@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">InsectID</string>
+    <string name="prediction">Nothing predicted yet</string>
 </resources>

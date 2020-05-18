@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.*
 import java.io.FileNotFoundException
@@ -76,6 +77,7 @@ class MainActivity : AppCompatActivity() {
                         identified = classifier.classify(bitmap)
                     }
                     Log.e("identity" , identified)
+                    findViewById<TextView>(R.id.this_insect_text).text = identified
                 }
 
 

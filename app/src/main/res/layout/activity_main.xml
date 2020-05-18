@@ -12,14 +12,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="14"
-        app:srcCompat="@android:drawable/divider_horizontal_bright" />
+        android:background="@android:drawable/divider_horizontal_bright" />
 
     <TextView
         android:id="@+id/this_insect_text"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="32dp"
         android:layout_weight="1"
-        android:text="TextView" />
+        android:textSize="16dp"
+        android:fontFamily="cursive"
+        android:gravity="center"
+        android:background="#5385AE"
+        android:text="@string/prediction" />
 
 
 </LinearLayout>
