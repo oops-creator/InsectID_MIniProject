@@ -7,23 +7,64 @@
     tools:context=".MainActivity"
     android:orientation="vertical">
 
+
+
     <ImageView
         android:id="@+id/insect_image"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="14"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:background="@android:drawable/divider_horizontal_bright" />
+
+
 
     <TextView
         android:id="@+id/this_insect_text"
         android:layout_width="match_parent"
         android:layout_height="32dp"
-        android:layout_weight="1"
+        android:layout_weight="0"
         android:textSize="16dp"
         android:fontFamily="cursive"
         android:gravity="center"
-        android:background="#5385AE"
-        android:text="@string/prediction" />
+        android:background="@color/allWhite"
+        android:text="@string/prediction"
+        android:minHeight="64dp"
+        android:layout_margin="8dp"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:orientation="horizontal"
+        android:layout_weight="0"
+        android:layout_marginBottom="4dp">
+
+        <ImageView
+            android:id="@+id/from_storage"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:src="@drawable/folder"
+            android:background="@color/allWhite"
+            />
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:id="@+id/detect"
+            android:text="Detect"
+            android:background="@color/allWhite"/>
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:id="@+id/from_camera"
+            android:src="@drawable/cam"
+            android:background="@color/allWhite"/>
+
+    </LinearLayout>
+
+
 
 
 </LinearLayout>

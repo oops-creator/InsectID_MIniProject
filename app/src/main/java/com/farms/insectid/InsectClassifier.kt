@@ -96,11 +96,19 @@ class InsectClassifier(private val context: Context) {
         val result = output[0]
         val maxIndex = result.indices.maxBy { result[it] } ?: -1
 
-        val resultString =
-            "Prediction Result: %d\nConfidence: %2f"
-                .format(maxIndex, result[maxIndex])
 
-        val res = result[maxIndex].toString()
+        var resultString = ""
+//            "Prediction Result: %d\nConfidence: %2f"
+//                .format(maxIndex, result[maxIndex])
+
+        when(maxIndex){
+            0 -> resultString = "Eocanthecona Bug"
+            1 -> resultString = "Tobacco Caterpillar"
+            2 -> resultString = "Red Hairy Caterpillar"
+            3 -> resultString = "Larva Spodoptera"
+
+        }
+//        val res = result[maxIndex].toString()
         Log.e("result", resultString)
         return resultString
     }
