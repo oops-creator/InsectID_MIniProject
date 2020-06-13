@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">InsectID</string>
-    <string name="prediction">Nothing predicted yet</string>
+    <string name="prediction">Select image from storage or camera</string>
 </resources>

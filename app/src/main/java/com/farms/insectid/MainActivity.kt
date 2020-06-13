@@ -1,6 +1,8 @@
 package com.farms.insectid
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -11,10 +13,11 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.*
 import java.io.FileNotFoundException
 import java.io.InputStream
@@ -47,16 +50,46 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+
+    fun isWriteStoragePermissionGranted(): Boolean {
+        return if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED
+            ) {
+                Log.v("Main", "Permission is granted2")
+                true
+            } else {
+                Log.v("Main", "Permission is revoked2")
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    2
+                )
+                false
+            }
+        } else { //permission is automatically granted on sdk<23 upon installation
+            Log.v("Main", "Permission is granted2")
+            true
+        }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
 
         findViewById<ImageView>(R.id.from_storage).setOnClickListener {
 
             val OpenImage = Intent(Intent.ACTION_GET_CONTENT)
             OpenImage.type = "*/*"
 
-
+            val grant = isWriteStoragePermissionGranted()
+            if(grant == false){
+                Toast.makeText(this  , "Permission Not Granted" , Toast.LENGTH_SHORT).show()
+            }
             val activities: List<ResolveInfo> = packageManager.queryIntentActivities(OpenImage, 0)
             val isIntentSafe: Boolean = activities.isNotEmpty()
 
@@ -78,12 +111,13 @@ class MainActivity : AppCompatActivity() {
     fun classify(bitmap: Bitmap){
         if(bitmap != null ) {
             uiScope.launch {
-                
+                findViewById<RelativeLayout>(R.id.loadingPanel).setVisibility(View.VISIBLE)
                 withContext(Dispatchers.IO) {
                     identified = classifier.classify(bitmap)
                 }
                 Log.e("identity", identified)
                 findViewById<TextView>(R.id.this_insect_text).text = identified
+                findViewById<RelativeLayout>(R.id.loadingPanel).setVisibility(View.GONE)
             }
         }
     }

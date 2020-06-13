@@ -103,9 +103,9 @@ class InsectClassifier(private val context: Context) {
 
         when(maxIndex){
             0 -> resultString = "Eocanthecona Bug"
-            1 -> resultString = "Tobacco Caterpillar"
+            1 -> resultString = "Larva Spodoptera"
             2 -> resultString = "Red Hairy Caterpillar"
-            3 -> resultString = "Larva Spodoptera"
+            3 -> resultString = "Tobacco Caterpillar"
 
         }
 //        val res = result[maxIndex].toString()
